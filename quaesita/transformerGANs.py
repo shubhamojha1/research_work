@@ -17,7 +17,10 @@ class VanillaTransformerGenerator(nn.Module):
 
     Arguments:
         model_params(dictionary): Refer example below -
-            seq2seq_model_params = { 'd_model': 512, 'nhead': 8,'dropout': 0.1,'num_of_enc_layers': 6,'num_of_dec_layers': 6,'input_sequence_length': 10,'forecasting_step': 2}
+            seq2seq_model_params = { 'd_model': 512, 
+            'nhead': 8,'dropout': 0.1,
+            'num_of_enc_layers': 6,'num_of_dec_layers': 6,
+            'input_sequence_length': 10,'forecasting_step': 2}
     """
     def __init__(self, model_params):
         super(VanillaTransformerGenerator, self).__init__()
@@ -34,11 +37,15 @@ class SequenceCritic(nn.Module):
 
     Arguments:
         model_params(dictionary): model dimensions as model parameters.
-                                    model_params = { 'd_model' : 512, 'activation_fn' : 'ReLU'/'LeakyReLU'/ 'tanh' / 'Swish' }
+                                    model_params = { 'd_model' : 512, 
+                                    'activation_fn' : 'ReLU'/'LeakyReLU'/ 'tanh' / 'Swish' }
     """
     def __init__(self, model_params):
         super(SequenceCritic, self).__init__()
 
+        # simple 4-layer perceptron
+        # input:- 1-dimension, which is increased with each layer
+        # tanh activation function [-1, 1] introduces non-linearity
         critic_model = nn.Sequential(
             nn.Linear(1, model_params['d_model']),
             nn.Tanh(),

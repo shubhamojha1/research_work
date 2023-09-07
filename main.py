@@ -25,7 +25,7 @@ from utils.utils import plot_output, train_tf_enc_dec_gan, train_and_evaluate_tf
 from quaesita.pre_process_data import getSampledData
 from quaesita.model import Transformer_EncoderDecoder_Seq2Seq, VanillaTransformer_seq2seq
 from quaesita.TimeSeriesDataset import timeseriesDatasetCreateBatch 
-from utils.loss.dilate_loss import DILATE_loss
+# from utils.loss.dilate_loss import DILATE_loss
 from quaesita.transformerGANs import VanillaTransformerGenerator, SequenceCritic
 from utils.optimizer import MADGRAD, improved_gradient_penalty
 from utils.utils import train_tf_encdec, test_tf_enc_dec
@@ -33,10 +33,14 @@ from utils.utils import mean_absolute_percentage_error as MAPE
 from utils.utils import root_mean_square_error as RMSE
 from utils.utils import mean_absolute_scaled_error as MASE
 import csv
+import os
 
 torch.manual_seed(1)
 
-EXP_FOLDER_PATH = 'cloudlabgpu1-output/TranImpWGAN/'
+# EXP_FOLDER_PATH = 'cloudlabgpu1-output/TranImpWGAN/'
+# EXP_FOLDER_PATH = './outputs/TranImpWGAN/'
+EXP_FOLDER_PATH = 'performance-reports/'
+
 
 D_MODEL = int(sys.argv[1])
 N_HEAD = int(sys.argv[2])
@@ -53,9 +57,9 @@ GPU = sys.argv[7]
 keys()
 ["google-1m", "azure-10m"]
 """
-with open('data/workloads-params.json') as f: 
-# with open('data/workloads-params.json') as f: 
-    input_workload = json.load(f)
+# with open('./data/borg_traces_data.csv', 'r') as f: 
+# # with open('data/workloads-params.json') as f: 
+#     input_workload = csv.reader(f)
 
 in_workload_key = str(DATASET_NAME)
 print(in_workload_key)
@@ -376,7 +380,7 @@ def call_main(_window_size, _batch_size,_train_data, _cross_val_data, _test_data
             print("Epoch:{}  Train MAPE:{}   G Loss:{}   D Loss:{}".format(e, mape_a, trainG_loss, trainD_loss))
     train_end_time = time.time() - start_time
     # save the model 
-    # torch.save(modelG.state_dict(),'RTX2080/best_saved_models/' + str(DATASET_NAME) + '.pth')
+    # torch.save(modelG.state_dict(),'./best_saved_models/' + str(DATASET_NAME) + '.pth')
 
     # # TESTING FOR MODEL A (train dataset)
     train_inference_start_time = time.time() - start_time
@@ -400,7 +404,9 @@ def call_main(_window_size, _batch_size,_train_data, _cross_val_data, _test_data
     
     train_df = [np.ceil(truth.tolist()), np.ceil(predicted.tolist())]
     train_df = pd.DataFrame(train_df,index=['truth','predicted']).transpose()
-    train_df.to_csv('RTX2080/prediction-outputs/'+str(DATASET_NAME)+'/'+str(DATASET_NAME)+str('_train.csv'))
+    if not os.path.exists('./prediction-outputs/'+str(DATASET_NAME)):
+        os.makedirs('./prediction-outputs/'+str(DATASET_NAME))
+    train_df.to_csv('./prediction-outputs/'+str(DATASET_NAME)+'/'+str(DATASET_NAME)+str('_train.csv'))
 
     # # TESTING FOR MODEL A (cross val dataset)
     cv_inference_start_time = time.time() - start_time
@@ -424,7 +430,7 @@ def call_main(_window_size, _batch_size,_train_data, _cross_val_data, _test_data
 
     cv_df = [np.ceil(truth.tolist()), np.ceil(predicted.tolist())]
     cv_df = pd.DataFrame(cv_df,index=['truth','predicted']).transpose()
-    cv_df.to_csv('RTX2080/prediction-outputs/'+str(DATASET_NAME)+'/'+str(DATASET_NAME)+str('_crossval.csv'))
+    cv_df.to_csv('./prediction-outputs/'+str(DATASET_NAME)+'/'+str(DATASET_NAME)+str('_crossval.csv'))
 
     # # TESTING FOR MODEL A (train dataset)
     test_inference_start_time = time.time() - start_time
@@ -448,7 +454,7 @@ def call_main(_window_size, _batch_size,_train_data, _cross_val_data, _test_data
 
     test_df = [np.ceil(truth.tolist()), np.ceil(predicted.tolist())]
     test_df = pd.DataFrame(test_df,index=['truth','predicted']).transpose()
-    test_df.to_csv('RTX2080/prediction-outputs/'+str(DATASET_NAME)+'/'+str(DATASET_NAME)+str('_test.csv'))
+    test_df.to_csv('./prediction-outputs/'+str(DATASET_NAME)+'/'+str(DATASET_NAME)+str('_test.csv'))
 
     del modelG
     del modelD
@@ -470,31 +476,34 @@ def call_main(_window_size, _batch_size,_train_data, _cross_val_data, _test_data
     return results
 
 
-with open(str(input_workload[in_workload_key])) as csvfile:
-    reader = csv.DictReader(csvfile)
-    print(reader)
-    count = 0
-    testNo = 0
-    dataNpArray = np.empty([0, 2], int)
-    scaleUp = 1
-    for row in reader:
-        # print(row)
-        jobCount = float(row['JobCount'])//float(scaleUp)
-        count = int(count) + 1
-        testNo = int(testNo) + 1
-        dataNpArray = np.append(dataNpArray, [[count, jobCount]], axis=0)
 
-index = [str(i) for i in range(1, len(dataNpArray) + 1)]
-data_df = pd.DataFrame(dataNpArray, index=index, columns=['timePeriod', 'jobCount'])
+# My implementation begins
+#---------------------------------------------------------------#
+FILE_PATH = './data/borg_traces_data.csv'
+# PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed.csv'
+# SMALL_PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed_small.csv'
+SMALL_PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed_10.csv'
 
-job_arrival_count = data_df[['jobCount']].values.astype('float32')
 
-dataset_name = in_workload_key
+# ########## RUN ONCE ONLY ##########
+# df = preprocessing(FILE_PATH)
+# df.to_csv(PREPROCESSED_FILE_PATH)
+# ########## RUN ONCE ONLY ##########
 
-# min-max scaling 
+# data_df=pd.read_csv(PREPROCESSED_FILE_PATH)
+data_df=pd.read_csv(SMALL_PREPROCESSED_FILE_PATH)
+data_df.reset_index(drop=True, inplace=True)
+data_df.drop(['timeCorr', 'event'], inplace=True, axis=1)
+#-----> need to handle 'event' column later
+
+job_arrival_count = data_df[['average_usage_cpu']].values.astype('float32')
+#-----> need to remove 'y' values from data_df
+
 scaler = MinMaxScaler(feature_range=(-1,1))
 
-# create test/validation/test 60-15-15 split
+scaler = MinMaxScaler(feature_range=(-1,1))
+
+# # create test/validation/test 60-15-15 split
 split_size = 20 # to create 80-20 split for the training/testing dataset
 test_data_size = int(math.ceil(len(job_arrival_count) * split_size / 100))
 
@@ -505,9 +514,12 @@ cv_data_size = int(math.ceil(len(_train_data1) * 0.25))
 _train_data = _train_data1[:-cv_data_size]
 _cross_val_data = _train_data1[-cv_data_size:]
 
-test_len = len(_test_data)
-print(len(_train_data), len(_cross_val_data), len(_test_data))
 
+print("Train Data: ", len(_train_data))
+print("Cross Validation Data: ", len(_cross_val_data))
+print("Test Data: ", len(_test_data))
+
+test_len = len(_test_data)
 _train_data = scaler.fit_transform(_train_data.reshape(-1,1))
 _test_data = scaler.fit_transform(_test_data.reshape(-1,1))
 _cross_val_data = scaler.fit_transform(_cross_val_data.reshape(-1,1))
@@ -516,26 +528,116 @@ _cross_val_data = scaler.fit_transform(_cross_val_data.reshape(-1,1))
 _train_data = torch.FloatTensor(_train_data)
 _cross_val_data = torch.FloatTensor(_cross_val_data)
 _test_data = torch.FloatTensor(_test_data)
-    
+
 lookback_set = np.round(np.arange(1,9,1) * 0.1 * test_len)         
-print(lookback_set)
+print("Lookback Set: ", lookback_set)
+
 experiment_params = [[WINDOW_SIZE, BATCH_SIZE]]
 
-results = np.empty([0,23],str)
+results = np.empty([0,23],str) # for data_df
 
 for _window_size, _batch_size in experiment_params:
-    _results = call_main(_window_size, _batch_size, _train_data, _cross_val_data, _test_data, GPU)#sys.argv[4])            # <----- call to the main func here
-    results = np.append(results, _results, axis = 0)
+    print("Working with: ", _window_size, 
+                         _batch_size, _train_data,
+                           _cross_val_data, _test_data, GPU)
+    _results = call_main(_window_size, 
+                         _batch_size, _train_data,
+                           _cross_val_data, _test_data, GPU)#sys.argv[4])
+    results = np.append(results, _results, axis = 0)            
+    # <----- call to the main func here
 
 index = [str(i) for i in range(1, len(results) + 1)]
+data_df = pd.DataFrame(results, index=index)
 data_df = pd.DataFrame(results, index=index, columns=['Dataset','Epoch','learning_rate','Cost function','Window Size','Batch Size', 'Dropout',
                                                                   'd_model','nhead','Train MAPE','Train RMSE','Train MASE','CV MAPE','CV RMSE','CV MASE','Test MAPE','Test RMSE', 'Test MASE', 'GPU Name',
                                                                   'training-time','train-inference-time','cv-inference-time','test-inference-time'
                                                                   ])
+if not os.path.exists(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv"):
+    with open(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv", 'w', newline='') as csv_file:
+        csv_writer = csv.DictWriter(csv_file, fieldnames=['Dataset','Epoch','learning_rate','Cost function','Window Size','Batch Size', 'Dropout',
+                                                                  'd_model','nhead','Train MAPE','Train RMSE','Train MASE','CV MAPE','CV RMSE','CV MASE','Test MAPE','Test RMSE', 'Test MASE', 'GPU Name',
+                                                                  'training-time','train-inference-time','cv-inference-time','test-inference-time'
+                                                                  ])
+        csv_writer.writeheader()
 curr_file = pd.read_csv(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv", usecols=['Dataset','Epoch','learning_rate','Cost function','Window Size','Batch Size', 'Dropout',
                                                                   'd_model','nhead','Train MAPE','Train RMSE','Train MASE','CV MAPE','CV RMSE','CV MASE','Test MAPE','Test RMSE', 'Test MASE', 'GPU Name',
                                                                   'training-time','train-inference-time','cv-inference-time','test-inference-time'
                                                                   ])
 
-data_df = data_df.append(curr_file)
+# data_df = data_df.append(curr_file)
 data_df.to_csv(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv")
+
+
+#---------------------------------------------------------------#
+
+
+# with open(str(input_workload[in_workload_key])) as csvfile:
+# with open('./data/borg_traces_data.csv', 'r') as csvfile:
+#     reader = csv.DictReader(csvfile)
+#     print(reader)
+#     count = 0
+#     testNo = 0
+#     dataNpArray = np.empty([0, 2], int)
+#     scaleUp = 1
+#     for row in reader:
+#         # print(row)
+#         jobCount = float(row['JobCount'])//float(scaleUp)
+#         count = int(count) + 1
+#         testNo = int(testNo) + 1
+#         dataNpArray = np.append(dataNpArray, [[count, jobCount]], axis=0)
+
+# index = [str(i) for i in range(1, len(dataNpArray) + 1)]
+# data_df = pd.DataFrame(dataNpArray, index=index, columns=['timePeriod', 'jobCount'])
+
+# job_arrival_count = data_df[['jobCount']].values.astype('float32')
+
+# dataset_name = in_workload_key
+
+# # min-max scaling 
+# scaler = MinMaxScaler(feature_range=(-1,1))
+
+# # create test/validation/test 60-15-15 split
+# split_size = 20 # to create 80-20 split for the training/testing dataset
+# test_data_size = int(math.ceil(len(job_arrival_count) * split_size / 100))
+
+# _train_data1 = job_arrival_count[:-test_data_size]
+# _test_data = job_arrival_count[-test_data_size:]
+
+# cv_data_size = int(math.ceil(len(_train_data1) * 0.25))
+# _train_data = _train_data1[:-cv_data_size]
+# _cross_val_data = _train_data1[-cv_data_size:]
+
+# test_len = len(_test_data)
+# print(len(_train_data), len(_cross_val_data), len(_test_data))
+
+# _train_data = scaler.fit_transform(_train_data.reshape(-1,1))
+# _test_data = scaler.fit_transform(_test_data.reshape(-1,1))
+# _cross_val_data = scaler.fit_transform(_cross_val_data.reshape(-1,1))
+
+# # convert data to 1D tensor
+# _train_data = torch.FloatTensor(_train_data)
+# _cross_val_data = torch.FloatTensor(_cross_val_data)
+# _test_data = torch.FloatTensor(_test_data)
+    
+# lookback_set = np.round(np.arange(1,9,1) * 0.1 * test_len)         
+# print(lookback_set)
+# experiment_params = [[WINDOW_SIZE, BATCH_SIZE]]
+
+# results = np.empty([0,23],str)
+
+# for _window_size, _batch_size in experiment_params:
+#     _results = call_main(_window_size, _batch_size, _train_data, _cross_val_data, _test_data, GPU)#sys.argv[4])            # <----- call to the main func here
+#     results = np.append(results, _results, axis = 0)
+
+# index = [str(i) for i in range(1, len(results) + 1)]
+# data_df = pd.DataFrame(results, index=index, columns=['Dataset','Epoch','learning_rate','Cost function','Window Size','Batch Size', 'Dropout',
+#                                                                   'd_model','nhead','Train MAPE','Train RMSE','Train MASE','CV MAPE','CV RMSE','CV MASE','Test MAPE','Test RMSE', 'Test MASE', 'GPU Name',
+#                                                                   'training-time','train-inference-time','cv-inference-time','test-inference-time'
+#                                                                   ])
+# curr_file = pd.read_csv(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv", usecols=['Dataset','Epoch','learning_rate','Cost function','Window Size','Batch Size', 'Dropout',
+#                                                                   'd_model','nhead','Train MAPE','Train RMSE','Train MASE','CV MAPE','CV RMSE','CV MASE','Test MAPE','Test RMSE', 'Test MASE', 'GPU Name',
+#                                                                   'training-time','train-inference-time','cv-inference-time','test-inference-time'
+#                                                                   ])
+
+# data_df = data_df.append(curr_file)
+# data_df.to_csv(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv")
