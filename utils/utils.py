@@ -246,7 +246,7 @@ def plot_output(path,model_name,x_input, truth, predicted, dataset_params, model
 
 def mean_absolute_percentage_error(y_true, y_pred):
     y_true, y_pred = np.array(y_true), np.array(y_pred)
-    return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+    return np.mean(np.abs((y_true - y_pred) / (y_true + 0.000001))) * 100
 
 def root_mean_square_error(y_true, y_pred):
     y_true, y_pred = np.array(y_true), np.array(y_pred)

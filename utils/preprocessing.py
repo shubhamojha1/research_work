@@ -50,7 +50,8 @@ def load_data(FILE_PATH):
     return df
 
 def handle_missing_values(df):
-    df = df.fillna(0)
+    # df = df.fillna(0)
+    df = df.fillna(0.000001)
     df['vertical_scaling'] = df['vertical_scaling'].astype(int)
     df['scheduler'] = df['scheduler'].astype(int)
     return df
@@ -122,7 +123,8 @@ def split_cpu_memory_values(df):
     return df
 
 def handle_distributions(df):
-    df=df.fillna(0)
+    # df=df.fillna(0)
+    df = df.fillna(0.000001)
     # Convert the string arrays to actual arrays
     df['cpu_usage_distribution'] = df['cpu_usage_distribution'].apply(lambda x: np.fromstring(x[1:-1], sep=' '))
     df['tail_cpu_usage_distribution'] = df['tail_cpu_usage_distribution'].apply(lambda x: np.fromstring(x[1:-1], sep=' '))
@@ -151,3 +153,12 @@ def preprocessing(FILE_PATH):
     final_df = handle_distributions(split_df)
     return final_df
     # return preprocessed_df
+
+
+FILE_PATH = '../data/borg_traces_data.csv'
+PREPROCESSED_FILE_PATH = '../data/borg_traces_data_preprocessed.csv'
+########## RUN ONCE ONLY ##########
+df = preprocessing(FILE_PATH)
+df.to_csv(PREPROCESSED_FILE_PATH)
+########## RUN ONCE ONLY ##########
+
