@@ -480,7 +480,7 @@ def call_main(_window_size, _batch_size,_train_data, _cross_val_data, _test_data
 # My implementation begins
 #---------------------------------------------------------------#
 FILE_PATH = './data/borg_traces_data.csv'
-PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed_10000.csv'
+PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed_100.csv'
 # SMALL_PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed_small.csv'
 # SMALL_PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed_100.csv'
 
@@ -549,25 +549,66 @@ for _window_size, _batch_size in experiment_params:
     # <----- call to the main func here
 
 index = [str(i) for i in range(1, len(results) + 1)]
+df_cols = ['Dataset','Epoch','learning_rate','Cost function','Window Size','Batch Size', 'Dropout',
+                                                                  'd_model','nhead','Train MAPE','Train RMSE','Train MASE','CV MAPE','CV RMSE','CV MASE','Test MAPE','Test RMSE', 'Test MASE', 'GPU Name',
+                                                                  'training-time','train-inference-time','cv-inference-time','test-inference-time'
+                                                                  ]
 data_df = pd.DataFrame(results, index=index)
 data_df = pd.DataFrame(results, index=index, columns=['Dataset','Epoch','learning_rate','Cost function','Window Size','Batch Size', 'Dropout',
                                                                   'd_model','nhead','Train MAPE','Train RMSE','Train MASE','CV MAPE','CV RMSE','CV MASE','Test MAPE','Test RMSE', 'Test MASE', 'GPU Name',
                                                                   'training-time','train-inference-time','cv-inference-time','test-inference-time'
                                                                   ])
+
+file_exists = os.path.exists(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv")
+writing_type = "a" if file_exists else "w"
 if not os.path.exists(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv"):
-    with open(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv", 'w', newline='') as csv_file:
+    with open(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv", writing_type, newline='') as csv_file:
         csv_writer = csv.DictWriter(csv_file, fieldnames=['Dataset','Epoch','learning_rate','Cost function','Window Size','Batch Size', 'Dropout',
-                                                                  'd_model','nhead','Train MAPE','Train RMSE','Train MASE','CV MAPE','CV RMSE','CV MASE','Test MAPE','Test RMSE', 'Test MASE', 'GPU Name',
-                                                                  'training-time','train-inference-time','cv-inference-time','test-inference-time'
-                                                                  ])
+                                                                    'd_model','nhead','Train MAPE','Train RMSE','Train MASE','CV MAPE','CV RMSE','CV MASE','Test MAPE','Test RMSE', 'Test MASE', 'GPU Name',
+                                                                    'training-time','train-inference-time','cv-inference-time','test-inference-time'
+                                                                    ])
         csv_writer.writeheader()
-curr_file = pd.read_csv(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv", usecols=['Dataset','Epoch','learning_rate','Cost function','Window Size','Batch Size', 'Dropout',
-                                                                  'd_model','nhead','Train MAPE','Train RMSE','Train MASE','CV MAPE','CV RMSE','CV MASE','Test MAPE','Test RMSE', 'Test MASE', 'GPU Name',
-                                                                  'training-time','train-inference-time','cv-inference-time','test-inference-time'
-                                                                  ])
+curr_file = pd.read_csv(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv") 
+# , usecols=['Dataset','Epoch','learning_rate','Cost function','Window Size','Batch Size', 'Dropout',
+#                                                                   'd_model','nhead','Train MAPE','Train RMSE','Train MASE','CV MAPE','CV RMSE','CV MASE','Test MAPE','Test RMSE', 'Test MASE', 'GPU Name',
+#                                                                   'training-time','train-inference-time','cv-inference-time','test-inference-time'
+#                                                                   ])
 
 # data_df = data_df.append(curr_file)
+data_df = pd.concat([data_df, curr_file], ignore_index=True)
 data_df.to_csv(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv")
+
+# data_df = pd.DataFrame(results, index=index)
+# data_df = pd.DataFrame(results, index=index, columns=df_cols)
+# csv_file_name = EXP_FOLDER_PATH + str(DATASET_NAME)+".csv"
+
+# # csv_file = open(csv_file_name, 'a', newline='') if os.path.isfile(csv_file_name) else open(csv_file_name, 'w', newline='')
+# # csv_writer = csv.writer(csv_file)
+# # if not os.path.isfile(csv_file_name):
+# #     header = df_cols
+# #     csv_writer.writerow(df_cols)
+
+# # csv_writer.writerow(results.tolist())
+# # print("******results*******", type(results.tolist()), results.tolist())
+# # csv_file.close()
+# # with open(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv", 'w' if not os.path.exists(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv") else 'a', newline='') as csv_file:
+# #     csv_writer = csv.DictWriter(csv_file, fieldnames=['Dataset','Epoch','learning_rate','Cost function','Window Size','Batch Size', 'Dropout',
+# #                                                                 'd_model','nhead','Train MAPE','Train RMSE','Train MASE','CV MAPE','CV RMSE','CV MASE','Test MAPE','Test RMSE', 'Test MASE', 'GPU Name',
+# #                                                                 'training-time','train-inference-time','cv-inference-time','test-inference-time'
+# #                                                                 ])
+    
+# # # else:
+# #         # csv_file = open(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv", 'a', newline=''):
+
+
+        
+# curr_file = pd.read_csv(results.tolist(), usecols=['Dataset','Epoch','learning_rate','Cost function','Window Size','Batch Size', 'Dropout',
+#                                                                   'd_model','nhead','Train MAPE','Train RMSE','Train MASE','CV MAPE','CV RMSE','CV MASE','Test MAPE','Test RMSE', 'Test MASE', 'GPU Name',
+#                                                                   'training-time','train-inference-time','cv-inference-time','test-inference-time'
+#                                                                   ])
+
+# data_df = data_df.append(curr_file)
+# data_df.to_csv(EXP_FOLDER_PATH + str(DATASET_NAME)+".csv")
 
 
 #---------------------------------------------------------------#
