@@ -3,7 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-data = pd.read_csv("../data/borg_traces_data_preprocessed_small.csv")
+data = pd.read_csv("../data/borg_traces_data_preprocessed_10000.csv")
+# ---> 10000.csv 
+# ['instance_events_type', 'hours', 'time_diff_hrs', 'average_usage_memory', 'cpu_median', 'tail_cpu_mean']
 data = data.fillna(0)
 
 # data.head()
@@ -35,6 +37,13 @@ import random
 import statistics
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import cross_val_score
+
+#using only 100.csv
+# feature_list_1 -> ['instance_events_type', 'scheduling_class', 'assigned_memory', 'cycles_per_instruction', 'memory_accesses_per_instruction', 'eventIndex', 'resource_request_cpu', 'average_usage_cpu', 'tail_cpu_median']
+# feature_list_2 -> ['instance_events_type', 'scheduling_class', 'vertical_scaling', 'assigned_memory', 'cycles_per_instruction', 'time_diff_hrs', 'eventIndex', 'average_usage_cpu', 'cpu_mean']
+# ['instance_events_type', 'collection_type', 'priority', 'vertical_scaling', 'page_cache_memory', 'memory_accesses_per_instruction', 'sample_rate', 'eventIndex', 'average_usage_memory']
+
+#
 
 def genetic_algo(data,features,target,population_size,tol_level,top_number):
 
@@ -226,7 +235,10 @@ def genetic_algo(data,features,target,population_size,tol_level,top_number):
 
 
 #running the algorithm
-top_features, best_f1_score = genetic_algo(x,x,y,40,0.000005,25)
+# top_features, best_f1_score = genetic_algo(x,x,y,40,0.000005,25)
+# top_features, best_f1_score = genetic_algo(x,x,y,40,0.002,5) works
+top_features, best_f1_score = genetic_algo(x,x,y,40,0.002,8)
+
 
 #printing top features selected through genetic algorithm
 i = 0
@@ -235,6 +247,7 @@ for i in range(len(top_features)):
   if(top_features[i]==1):
     list_of_features.append(x.columns[i])
 
+print("***************")
 print(top_features)
 print(list_of_features)
 print(best_f1_score)
