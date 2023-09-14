@@ -480,7 +480,7 @@ def call_main(_window_size, _batch_size,_train_data, _cross_val_data, _test_data
 # My implementation begins
 #---------------------------------------------------------------#
 FILE_PATH = './data/borg_traces_data.csv'
-PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed_100.csv'
+PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed_10000.csv'
 # SMALL_PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed_small.csv'
 # SMALL_PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed_100.csv'
 
@@ -498,7 +498,16 @@ data_df.reset_index(drop=True, inplace=True)
 data_df.drop(['timeCorr', 'event'], inplace=True, axis=1)
 #-----> need to handle 'event' column later
 
-job_arrival_count = data_df[['average_usage_cpu', 'scheduling_class', 'assigned_memory', 'memory_accesses_per_instruction']].values.astype('float32')
+print("Dataset in use: ", data_df)
+# job_arrival_count = data_df[['average_usage_cpu', 'scheduling_class', 'assigned_memory', 'memory_accesses_per_instruction']].values.astype('float32')
+# job_arrival_count = data_df.drop('failed', inplace=True, axis=1).values.astype('float32')
+
+genetic_algo_selected_cols = ['instance_events_type', 'hours', 'time_diff_hrs', 'average_usage_memory', 'cpu_median', 'tail_cpu_mean']
+print("Top Features: ", genetic_algo_selected_cols)
+
+
+# job_arrival_count = data_df.drop('failed', inplace=True, axis=1).values.astype('float32')
+job_arrival_count = data_df[genetic_algo_selected_cols].values.astype('float32')
 #-----> need to remove 'y' values from data_df
 
 scaler = MinMaxScaler(feature_range=(-1,1))
