@@ -348,11 +348,15 @@ def call_main(_window_size, _batch_size,_train_data, _cross_val_data, _test_data
     modelD.to('cuda')
 
     step_num = len(train_datasetA) // int(_batch_size)
-    lr = 0.01
+    lr = 0.001 #0.01 # try changing learning rate 
 
     # optimizers for respective model
-    optimizer_G = MADGRAD(modelG.parameters(), lr= lr)#, weight_decay = WEIGHT_DECAY)       # <---- weight decay here is default
-    optimizer_D = MADGRAD(modelD.parameters(), lr= lr)                                      # <---- weight decay here is default
+    # optimizer_G = MADGRAD(modelG.parameters(), lr= lr)#, weight_decay = WEIGHT_DECAY)       # <---- weight decay here is default
+    # optimizer_D = MADGRAD(modelD.parameters(), lr= lr)                                      # <---- weight decay here is default
+
+    # trying different hyperparameters
+    optimizer_G = MADGRAD(modelG.parameters(), lr= lr) #, weight_decay = WEIGHT_DECAY)       # <---- weight decay here is default
+    optimizer_D = MADGRAD(modelD.parameters(), lr= lr)      
 
     start_time = time.time()                # start time for the entire loop
 
@@ -477,7 +481,7 @@ def call_main(_window_size, _batch_size,_train_data, _cross_val_data, _test_data
 
 
 
-# My implementation begins
+# My training implementation begins
 #---------------------------------------------------------------#
 FILE_PATH = './data/borg_traces_data.csv'
 PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed_10000.csv'

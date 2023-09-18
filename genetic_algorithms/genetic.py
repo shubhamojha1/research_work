@@ -46,9 +46,6 @@ from sklearn.model_selection import cross_val_score
 #
 
 def genetic_algo(data,features,target,population_size,tol_level,top_number):
-
-
-
   def init_population(population_size,c,top_number):
     population = []
     for i in range(population_size):

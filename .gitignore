@@ -1,4 +1,6 @@
 # large dataset files 
 data/borg_traces_data.csv
 data/borg_traces_data_preprocessed.csv
+data/other/dfas.csv
+Reference Research Paper.pdf
 *.ipynb_checkpoints*
