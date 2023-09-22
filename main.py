@@ -42,9 +42,9 @@ torch.manual_seed(1)
 EXP_FOLDER_PATH = 'performance-reports/'
 
 
-D_MODEL = int(sys.argv[1])
-N_HEAD = int(sys.argv[2])
-DROPOUT = float(sys.argv[3])
+D_MODEL = int(sys.argv[1]) # hidden layer size
+N_HEAD = int(sys.argv[2]) # number of self-attention heads
+DROPOUT = float(sys.argv[3]) # dropout rate
 
 WINDOW_SIZE = sys.argv[4]
 BATCH_SIZE = sys.argv[5]
@@ -484,7 +484,7 @@ def call_main(_window_size, _batch_size,_train_data, _cross_val_data, _test_data
 # My training implementation begins
 #---------------------------------------------------------------#
 FILE_PATH = './data/borg_traces_data.csv'
-PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed_10000.csv'
+PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed.csv'
 # SMALL_PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed_small.csv'
 # SMALL_PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed_100.csv'
 
