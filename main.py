@@ -494,7 +494,9 @@ PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed.csv'
 # df.to_csv(PREPROCESSED_FILE_PATH)
 # ########## RUN ONCE ONLY ##########
 
-# default command: python main.py 64 4 0.1 1 1024 google nvidia-geforce-1650 
+# default command: 
+# python main.py 64 4 0.1 1 1024 goog le nvidia-geforce-1650 
+# python main.py 256 8 0.5 1024 google_large nvidia-geforce-1650
 
 # data_df=pd.read_csv(PREPROCESSED_FILE_PATH)
 data_df=pd.read_csv(PREPROCESSED_FILE_PATH)
