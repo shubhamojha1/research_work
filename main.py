@@ -485,8 +485,9 @@ def call_main(_window_size, _batch_size,_train_data, _cross_val_data, _test_data
 #---------------------------------------------------------------#
 FILE_PATH = './data/borg_traces_data.csv'
 PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed.csv'
-# SMALL_PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed_small.csv'
-# SMALL_PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed_100.csv'
+
+# FILE_PATH = './data/other/dfas.csv'
+# PREPROCESSED_FILE_PATH = './data/other/dfas_preprocessed.csvS'
 
 
 # ########## RUN ONCE ONLY ##########
@@ -501,6 +502,7 @@ PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed.csv'
 # data_df=pd.read_csv(PREPROCESSED_FILE_PATH)
 data_df=pd.read_csv(PREPROCESSED_FILE_PATH)
 data_df.reset_index(drop=True, inplace=True)
+# data_df = data_df.head(400000)
 data_df.drop(['timeCorr', 'event'], inplace=True, axis=1)
 #-----> need to handle 'event' column later
 
