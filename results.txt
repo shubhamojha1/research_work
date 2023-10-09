@@ -1,0 +1,1 @@
+- Dropout: 0.5 [anything lesser leads to overfitting]
