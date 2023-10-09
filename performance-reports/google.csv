@@ -1,0 +1,2 @@
+,Dataset,Epoch,learning_rate,Cost function,Window Size,Batch Size,Dropout,d_model,nhead,Train MAPE,Train RMSE,Train MASE,CV MAPE,CV RMSE,CV MASE,Test MAPE,Test RMSE,Test MASE,GPU Name,training-time,train-inference-time,cv-inference-time,test-inference-time
+0,google,1000,0.001,mae,1,256,0.5,128,4,13177.86,tensor([3.1199]),0.6852011826422063,13098.67,tensor([3.1202]),0.6882058362010903,13110.98,tensor([3.1111]),0.6887851342237857,nvidia-geforce-1650,56732.91274523735,7.531242609024048,2.8386504650115967,2.448070764541626
