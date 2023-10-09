@@ -487,7 +487,7 @@ FILE_PATH = './data/borg_traces_data.csv'
 PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed.csv'
 
 # FILE_PATH = './data/other/dfas.csv'
-# PREPROCESSED_FILE_PATH = './data/other/dfas_preprocessed.csvS'
+# PREPROCESSED_FILE_PATH = './data/other/dfas_preprocessed_final.csv'
 
 
 # ########## RUN ONCE ONLY ##########
@@ -495,27 +495,33 @@ PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed.csv'
 # df.to_csv(PREPROCESSED_FILE_PATH)
 # ########## RUN ONCE ONLY ##########
 
-# default command: 
-# python main.py 64 4 0.1 1 1024 goog le nvidia-geforce-1650 
-# python main.py 256 8 0.5 1024 google_large nvidia-geforce-1650
+
+# latest command: 
+# python main.py 256 4 0.5 1 1024 google_resource_request nvidia-gtx-1650
 
 # data_df=pd.read_csv(PREPROCESSED_FILE_PATH)
 data_df=pd.read_csv(PREPROCESSED_FILE_PATH)
 data_df.reset_index(drop=True, inplace=True)
-# data_df = data_df.head(400000)
-data_df.drop(['timeCorr', 'event'], inplace=True, axis=1)
+# data_df = data_df.head(20000)
+# data_df.drop(['timeCorr'  , 'event'], inplace=True, axis=1)
 #-----> need to handle 'event' column later
+print("###############################")
+print("Dataset in use: ", DATASET_NAME)
+print("Length: ", len(data_df))
+print("###############################")
 
-print("Dataset in use: ", data_df)
 # job_arrival_count = data_df[['average_usage_cpu', 'scheduling_class', 'assigned_memory', 'memory_accesses_per_instruction']].values.astype('float32')
 # job_arrival_count = data_df.drop('failed', inplace=True, axis=1).values.astype('float32')
 
-genetic_algo_selected_cols = ['instance_events_type', 'hours', 'time_diff_hrs', 'average_usage_memory', 'cpu_median', 'tail_cpu_mean']
-print("Top Features: ", genetic_algo_selected_cols)
+# genetic_algo_selected_cols = ['instance_events_type', 'hours', 'time_diff_hrs', 'average_usage_memory', 'cpu_median', 'tail_cpu_mean']
+# print("Top Features: ", genetic_algo_selected_cols)
 
 
 # job_arrival_count = data_df.drop('failed', inplace=True, axis=1).values.astype('float32')
-job_arrival_count = data_df[genetic_algo_selected_cols].values.astype('float32')
+# job_arrival_count = data_df[genetic_algo_selected_cols].values.astype('float32')
+# job_arrival_count = data_df[['average_usage_cpu', 'average_usage_memory']].values.astype('float32')
+job_arrival_count = data_df[['resource_request_cpu', 'resource_request_memory']].values.astype('float32')
+print(job_arrival_count)
 #-----> need to remove 'y' values from data_df
 
 scaler = MinMaxScaler(feature_range=(-1,1))

@@ -40,6 +40,8 @@ def generateDataJobEventsCSV(path='../job_events/'):
             swap = [data_job, buffer]
             data_job = pd.concat(swap)  # concat the read data to buffer data
             
+    # dataframe created until here
+
     # sort the job events values based on time        
     data_job = data_job.sort_values(['time'])
 
@@ -54,6 +56,9 @@ def generateDataJobEventsCSV(path='../job_events/'):
     job_arrival_rate = job_arrival_rate[data_bool]
 
     job_arrival_rate.to_csv('output.csv',index=True)
+    #######################################
+    #  job_arrival_rate csv, sorted by time
+    #######################################
 
 def getSampledData(job_arrival_rate, time_interval=30, event_type=0, path = None):
     r""" Return job arrival count filtered data for event_type at input sample rate 
@@ -61,14 +66,14 @@ def getSampledData(job_arrival_rate, time_interval=30, event_type=0, path = None
     event_type: type of events we want to process"""
 
     # filter the data with event type = 0 'SUBMIT (0): A task or job became eligible for scheduling'
-    data_bool = job_arrival_rate['event type'] == 0
+    data_bool = job_arrival_rate['event type'] == 0 # filter out only event_type==0
 
     if DEBUG:
         print('data_bool')
         print(data_bool)
 
     job_arrival_rate = job_arrival_rate[data_bool]
-    job_arrival_rate = job_arrival_rate.drop(columns='event type')  # drop the event_type column
+    job_arrival_rate = job_arrival_rate.drop(columns='event type')  # drop the event_type column, now dataframe only has 'job ID'
 
     if DEBUG:
         print('job_arrival_rate')
@@ -90,7 +95,7 @@ def getSampledData(job_arrival_rate, time_interval=30, event_type=0, path = None
     job_arrival_rate = job_arrival_rate.drop(columns='Unnamed: 0')
 
     # change the column name to job_count 
-    job_arrival_rate.columns = ['job_count']
+    job_arrival_rate.columns = ['job_count'] # column name changed from 'job ID' to job_count
 
     # capture moving average of the data 
     # moving average over the period of one week
@@ -199,6 +204,9 @@ def getSampledDataFiltered(data_job, time_interval, event_type, scheduling_class
     job_arrival_count = job_arrival_rate['job_count'].values.astype(float)
 
     return job_arrival_count
+    ##########################
+    # job_arrival_count contains values sorted by 'event type' and 'scheduling class'
+    #########################
 
 def gen_covariates(times, dims):
     covariates = np.zeros((times.shape[0], dims))
