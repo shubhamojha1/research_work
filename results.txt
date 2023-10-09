@@ -1,1 +1,2 @@
 - Dropout: 0.5 [anything lesser leads to overfitting]
+- Model Dimensions (d_model) [512 leads to overfitting almost always. need to confirm]
