@@ -348,7 +348,8 @@ def call_main(_window_size, _batch_size,_train_data, _cross_val_data, _test_data
     modelD.to('cuda')
 
     step_num = len(train_datasetA) // int(_batch_size)
-    lr = 0.001 #0.01 # try changing learning rate 
+    lr = 1e-5 #0.001 #0.01 # try changing learning rate
+    print("Learning Rate: ", lr) 
 
     # optimizers for respective model
     # optimizer_G = MADGRAD(modelG.parameters(), lr= lr)#, weight_decay = WEIGHT_DECAY)       # <---- weight decay here is default
@@ -498,6 +499,7 @@ PREPROCESSED_FILE_PATH = './data/borg_traces_data_preprocessed.csv'
 
 # latest command: 
 # python main.py 256 4 0.5 1 1024 google_resource_request nvidia-gtx-1650
+# python main.py 512 8 0.5 1 1024 google_resource_request_cpu nvidia-gtx-1650
 
 # data_df=pd.read_csv(PREPROCESSED_FILE_PATH)
 data_df=pd.read_csv(PREPROCESSED_FILE_PATH)
@@ -520,7 +522,11 @@ print("###############################")
 # job_arrival_count = data_df.drop('failed', inplace=True, axis=1).values.astype('float32')
 # job_arrival_count = data_df[genetic_algo_selected_cols].values.astype('float32')
 # job_arrival_count = data_df[['average_usage_cpu', 'average_usage_memory']].values.astype('float32')
-job_arrival_count = data_df[['resource_request_cpu', 'resource_request_memory']].values.astype('float32')
+
+feature_in_use = 'resource_request_memory'
+# data_df[['Job ID', 'Event Type', '']]
+job_arrival_count = data_df[[feature_in_use]].values.astype('float32')
+print("FEATURE IN USE: ", feature_in_use)
 print(job_arrival_count)
 #-----> need to remove 'y' values from data_df
 
