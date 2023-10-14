@@ -1,5 +1,5 @@
 # large dataset files
-*.pyc 
+quaesita/*.pyc 
 data/borg_traces_data.csv
 data/borg_traces_data_preprocessed.csv
 data/other/dfas.csv
